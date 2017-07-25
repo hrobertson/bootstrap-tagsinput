@@ -449,6 +449,22 @@
               $input.focus();
             }
             break;
+          case 'Home':
+            // Try to move the input before the first tag
+            var $firstTag = $inputWrapper.siblings().first();
+            if ($input.val().length === 0 && $firstTag[0]) {
+              $firstTag.before($inputWrapper);
+              $input.focus();
+            }
+            break;
+          case 'End':
+            // Try to move the input after the last tag
+            var $lastTag = $inputWrapper.siblings().last();
+            if ($input.val().length === 0 && $lastTag[0]) {
+              $lastTag.after($inputWrapper);
+              $input.focus();
+            }
+            break;
          default:
              // ignore
          }
