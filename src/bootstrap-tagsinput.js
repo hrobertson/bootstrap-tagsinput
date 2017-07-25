@@ -20,6 +20,7 @@
     maxTags: undefined,
     maxChars: undefined,
     confirmKeys: ['Enter', ','],
+    confirmOnPaste: false,
     deleteKeys: ['Backspace', 'Delete'],
     delimiter: ',',
     delimiterRegex: null,
@@ -396,7 +397,7 @@
         },
       });
 
-      self.$container.on('keydown', 'input', $.proxy(function(event) {
+      self.$container.on('keydown input', 'input', $.proxy(function(event) {
         var $input = $(event.target),
             $inputWrapper = self.findInputWrapper();
 
@@ -459,7 +460,7 @@
         $input.attr('size', Math.max(this.inputSize, $input.val().length));
       }, self));
 
-      self.$container.on('keypress', 'input', $.proxy(function(event) {
+      self.$container.on('keypress input', 'input', $.proxy(function(event) {
          var $input = $(event.target);
 
          if (self.$element.attr('disabled')) {
@@ -469,7 +470,7 @@
 
          var text = $input.val(),
          maxLengthReached = self.options.maxChars && text.length >= self.options.maxChars;
-         if (self.options.freeInput && (keyInList(event, self.options.confirmKeys) || maxLengthReached)) {
+         if (self.options.freeInput && (keyInList(event, self.options.confirmKeys) || (self.options.confirmOnPaste && event.originalEvent.type === 'input') || maxLengthReached)) {
             // Only attempt to add a tag if there is data in the field
             if (text.length !== 0) {
                self.add(maxLengthReached ? text.substr(0, self.options.maxChars) : text);
