@@ -394,6 +394,8 @@
         },
         focusout: function() {
           self.$container.removeClass(self.options.focusClass);
+          var $inputWrapper = self.findInputWrapper();
+          $inputWrapper.siblings().last().after($inputWrapper);
         },
       });
 
