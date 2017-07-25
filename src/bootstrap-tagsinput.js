@@ -475,6 +475,7 @@
             if (text.length !== 0) {
                self.add(maxLengthReached ? text.substr(0, self.options.maxChars) : text);
                $input.val('');
+               event.preventDefault();
             }
 
             // If the field is empty, let the event triggered fire as usual
