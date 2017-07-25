@@ -34,17 +34,17 @@ angular.module('bootstrap-tagsinput', [])
             : null;
 
         select.tagsinput(scope.$parent[attrs.options || ''] || {
-          typeahead : {
-            source   : angular.isFunction(typeaheadSource) ? typeaheadSource : null
-          },
+          typeahead : angular.isFunction(typeaheadSource) ? {
+            source   : typeaheadSource
+          } : void 0,
           itemValue: getItemProperty(scope, attrs.itemvalue),
           itemText : getItemProperty(scope, attrs.itemtext),
-          maxTags: !isNaN(attrs.maxTags) ? attrs.maxTags : undefined,
-          maxChars: !isNaN(attrs.maxChars) ? attrs.maxChars : undefined,
+          maxTags: !isNaN(attrs.maxTags) ? attrs.maxTags : void 0,
+          maxChars: !isNaN(attrs.maxChars) ? attrs.maxChars : void 0,
           trimValue: attrs.trimValue === 'true' ? true : false,
           allowDuplicates: attrs.allowDuplicates === 'true' ? true : false,
-          confirmKeys : getItemProperty(scope, attrs.confirmkeys) ? JSON.parse(attrs.confirmkeys) : [13],
-          tagClass : angular.isFunction(scope.$parent[attrs.tagclass]) ? scope.$parent[attrs.tagclass] : function(item) { return attrs.tagclass; }
+          confirmKeys : getItemProperty(scope, attrs.confirmkeys) ? JSON.parse(attrs.confirmkeys) : void 0,
+          tagClass : angular.isFunction(scope.$parent[attrs.tagclass]) ? scope.$parent[attrs.tagclass] : (angular.isDefined(attrs.tagclass) ? function(item) { return attrs.tagclass; } : void 0)
         });
 
         for (var i = 0; i < scope.model.length; i++) {
