@@ -17,13 +17,13 @@ describe("bootstrap-tagsinput", function() {
 
       it("should add tag on when pressing ENTER", function() {
         this.$tagsinput_input.val('some_tag');
-        this.$tagsinput_input.trigger($.Event('keypress', { which: 13 }));
+        this.$tagsinput_input.trigger($.Event('keypress', { key: 'Enter' }));
         expect(this.$element.tagsinput('items').length).toBe(1);
       });
 	  
       it("should add tag on when pressing COMMA ,", function() {
         this.$tagsinput_input.val('some_tag');
-        this.$tagsinput_input.trigger($.Event('keypress', { which: 44 }));
+        this.$tagsinput_input.trigger($.Event('keypress', { key: ',' }));
         expect(this.$element.tagsinput('items').length).toBe(1);
       });
 
@@ -146,18 +146,18 @@ describe("bootstrap-tagsinput", function() {
         });
 
         it('after last tag, should remove the last tag', function() {
-          this.$tagsinput_input.trigger($.Event('keydown', { which: 8 }));
+          this.$tagsinput_input.trigger($.Event('keydown', { key: 'Backspace' }));
           expect(this.$element.tagsinput('items')[0]).toBe('some');
         });
 
         it('after last tag, should remove the last tag', function() {
-          this.$tagsinput_input.trigger($.Event('keydown', { which: 8 }));
+          this.$tagsinput_input.trigger($.Event('keydown', { key: 'Backspace' }));
           expect(this.$element.tagsinput('items').length).toBe(1);
         });
 
         it('after first tag, should remove the first tag', function() {
-          this.$tagsinput_input.trigger($.Event('keydown', { which: 37 }));
-          this.$tagsinput_input.trigger($.Event('keydown', { which: 8 }));
+          this.$tagsinput_input.trigger($.Event('keydown', { key: 'ArrowLeft' }));
+          this.$tagsinput_input.trigger($.Event('keydown', { key: 'Backspace' }));
           expect(this.$element.tagsinput('items')[0]).toBe('tags');
         });
       });
@@ -166,22 +166,22 @@ describe("bootstrap-tagsinput", function() {
         beforeEach(function() {
           this.$element.tagsinput('focus');
           // move cursor before last tag
-          this.$tagsinput_input.trigger($.Event('keydown', { which: 37 }));
+          this.$tagsinput_input.trigger($.Event('keydown', { key: 'ArrowLeft' }));
         });
 
         it('before last tag, should remove the last tag', function() {
-          this.$tagsinput_input.trigger($.Event('keydown', { which: 46 }));
+          this.$tagsinput_input.trigger($.Event('keydown', { key: 'Delete' }));
           expect(this.$element.tagsinput('items')[0]).toBe('some');
         });
 
         it('before last tag, should remove the last tag', function() {
-          this.$tagsinput_input.trigger($.Event('keydown', { which: 46 }));
+          this.$tagsinput_input.trigger($.Event('keydown', { key: 'Delete' }));
           expect(this.$element.tagsinput('items').length).toBe(1);
         });
 
         it('before first tag, should remove the first tag', function() {
-          this.$tagsinput_input.trigger($.Event('keydown', { which: 37 }));
-            this.$tagsinput_input.trigger($.Event('keydown', { which: 46 }));
+          this.$tagsinput_input.trigger($.Event('keydown', { key: 'ArrowLeft' }));
+          this.$tagsinput_input.trigger($.Event('keydown', { key: 'Delete' }));
           expect(this.$element.tagsinput('items')[0]).toBe('tags');
         });
       });
@@ -207,10 +207,10 @@ describe("bootstrap-tagsinput", function() {
       })
     });
 
-    testTagsInput('<input type="text" />', { confirmKeys: [9] }, function() {
+    testTagsInput('<input type="text" />', { confirmKeys: ['Tab'] }, function() {
       it("should add tag on when pressing TAB", function() {
         this.$tagsinput_input.val('some_tag');
-        this.$tagsinput_input.trigger($.Event('keypress', { which: 9 }));
+        this.$tagsinput_input.trigger($.Event('keypress', { key: 'Tab' }));
         expect(this.$element.tagsinput('items').length).toBe(1);
       });
     });
