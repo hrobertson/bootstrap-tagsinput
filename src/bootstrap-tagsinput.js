@@ -342,15 +342,24 @@
 
       // typeahead.js
       if (self.options.typeaheadjs) {
-        // Determine if main configurations were passed or simply a dataset
-        var typeaheadjs = self.options.typeaheadjs;
-        if (!$.isArray(typeaheadjs)) {
-            typeaheadjs = [null, typeaheadjs];
+        // Initially assume just a dataset was passed
+        var datasets = [self.options.typeaheadjs];
+        var typeaheadjsArgs = [null, datasets];
+
+        if ($.isArray(self.options.typeaheadjs)) {
+            var typeaheadjsOptions = self.options.typeaheadjs[0];
+            // Datasets can be passed as an array or as N arguments
+            if ($.isArray(self.options.typeaheadjs[1])) {
+                datasets = typeaheadjsOptions[1];
+            } else {
+                datasets = [].slice.call(self.options.typeaheadjs, 1);
+            }
+            typeaheadjsArgs = [typeaheadjsOptions, datasets];
         }
 
-        $.fn.typeahead.apply(self.$input, typeaheadjs).on('typeahead:selected', $.proxy(function (obj, datum, name) {
+        $.fn.typeahead.apply(self.$input, typeaheadjsArgs).on('typeahead:selected', $.proxy(function (obj, datum, name) {
           var index = 0;
-          typeaheadjs.some(function(dataset, _index) {
+          datasets.some(function(dataset, _index) {
             if (dataset.name === name) {
               index = _index;
               return true;
@@ -359,8 +368,8 @@
           });
 
           // @TODO Dep: https://github.com/corejavascript/typeahead.js/issues/89
-          if (typeaheadjs[index].valueKey) {
-            self.add(datum[typeaheadjs[index].valueKey]);
+          if (datasets[index].valueKey) {
+            self.add(datum[datasets[index].valueKey]);
           } else {
             self.add(datum);
           }
