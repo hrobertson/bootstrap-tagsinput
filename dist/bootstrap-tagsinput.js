@@ -1,5 +1,5 @@
 /*
- * bootstrap-tagsinput v0.8.0
+ * bootstrap-tagsinput v0.9.0
  * 
  */
 
@@ -24,7 +24,9 @@
     addOnBlur: true,
     maxTags: undefined,
     maxChars: undefined,
-    confirmKeys: [13, 44],
+    confirmKeys: ['Enter', ','],
+    confirmOnPaste: false,
+    deleteKeys: ['Backspace', 'Delete'],
     delimiter: ',',
     delimiterRegex: null,
     cancelConfirmKeysOnEmpty: false,
@@ -33,7 +35,8 @@
     },
     trimValue: false,
     allowDuplicates: false,
-    triggerChange: true
+    triggerChange: true,
+    caseSensitive: true
   };
 
   /**
@@ -114,8 +117,8 @@
           tagClass = self.options.tagClass(item),
           itemTitle = self.options.itemTitle(item);
 
-      // Ignore items allready added
-      var existing = $.grep(self.itemsArray, function(item) { return self.options.itemValue(item) === itemValue; } )[0];
+       // Ignore items already added
+      var existing = $.grep(self.itemsArray, function(item) { return self.options.caseSensitive ?  self.options.itemValue(item) === itemValue : self.options.itemValue(item).toLowerCase() === itemValue.toLowerCase();} )[0];
       if (existing && !self.options.allowDuplicates) {
         // Invoke onTagExists
         if (self.options.onTagExists) {
@@ -146,16 +149,17 @@
       $tag.after(' ');
 
       // Check to see if the tag exists in its raw or uri-encoded form
+	  var escapedItemValue = escapeString(itemValue);
       var optionExists = (
         $('option[value="' + encodeURIComponent(itemValue) + '"]', self.$element).length ||
-        $('option[value="' + htmlEncode(itemValue) + '"]', self.$element).length
+        $('option[value="' + htmlEncode(escapedItemValue) + '"]', self.$element).length
       );
 
       // add <option /> if item represents a value not present in one of the <select />'s options
       if (self.isSelect && !optionExists) {
         var $option = $('<option selected>' + htmlEncode(itemText) + '</option>');
         $option.data('item', item);
-        $option.attr('value', itemValue);
+        $option.attr('value', escapedItemValue);
         self.$element.append($option);
       }
 
@@ -296,7 +300,7 @@
       makeOptionItemFunction(self.options, 'itemText');
       makeOptionFunction(self.options, 'tagClass');
 
-      // Typeahead Bootstrap version 2.3.2
+      // Bootstrap-3-Typeahead (https://github.com/bassjobsen/Bootstrap-3-Typeahead)
       if (self.options.typeahead) {
         var typeahead = self.options.typeahead || {};
 
@@ -304,66 +308,79 @@
 
         self.$input.typeahead($.extend({}, typeahead, {
           source: function (query, process) {
-            function processItems(items) {
-              var texts = [];
+            function processData(data) {
+              if (!data)
+                return;
 
-              for (var i = 0; i < items.length; i++) {
-                var text = self.options.itemText(items[i]);
-                map[text] = items[i];
-                texts.push(text);
+              if ($.isFunction(data.success)) {
+                // support for Angular callbacks
+                data.success(process);
+              } else if ($.isFunction(data.then)) {
+                // support for Angular promises
+                data.then(process);
+              } else {
+                // support for functions and jquery promises
+                $.when(data).then(process);
               }
-              process(texts);
             }
 
-            this.map = {};
-            var map = this.map,
-                data = typeahead.source(query);
-
-            if ($.isFunction(data.success)) {
-              // support for Angular callbacks
-              data.success(processItems);
-            } else if ($.isFunction(data.then)) {
-              // support for Angular promises
-              data.then(processItems);
-            } else {
-              // support for functions and jquery promises
-              $.when(data)
-               .then(processItems);
+            // Bloodhound (since 0.11) needs three arguments. 
+            // Two of them are callback functions (sync and async) for local and remote data processing
+            // see https://github.com/twitter/typeahead.js/blob/master/src/bloodhound/bloodhound.js#L132
+            if ($.isFunction(typeahead.source) && typeahead.source.length === 3) {
+              typeahead.source(query, processData, processData);
+            }
+            else {
+              // data is directly returned by source function
+              processData(typeahead.source(query));
             }
           },
-          updater: function (text) {
-            self.add(this.map[text]);
-            return this.map[text];
-          },
-          matcher: function (text) {
-            return (text.toLowerCase().indexOf(this.query.trim().toLowerCase()) !== -1);
-          },
-          sorter: function (texts) {
-            return texts.sort();
-          },
-          highlighter: function (text) {
-            var regex = new RegExp( '(' + this.query + ')', 'gi' );
-            return text.replace( regex, "<strong>$1</strong>" );
+          updater: function (item) {
+            if (self.objectItems)
+              self.add(self.options.itemValue(item));
+            else
+              self.add(self.options.itemText(item));
+            return '';
           }
         }));
       }
 
       // typeahead.js
       if (self.options.typeaheadjs) {
+        // Initially assume just a dataset was passed
+        var datasets = [self.options.typeaheadjs];
+        var typeaheadjsArgs = [null, datasets];
 
-          // Determine if main configurations were passed or simply a dataset
-          var typeaheadjs = self.options.typeaheadjs;
-          if (!$.isArray(typeaheadjs)) {
-              typeaheadjs = [null, typeaheadjs];
+        if ($.isArray(self.options.typeaheadjs)) {
+            var typeaheadjsOptions = self.options.typeaheadjs[0];
+            // Datasets can be passed as an array or as N arguments
+            if ($.isArray(self.options.typeaheadjs[1])) {
+                datasets = typeaheadjsOptions[1];
+            } else {
+                datasets = [].slice.call(self.options.typeaheadjs, 1);
+            }
+            typeaheadjsArgs = [typeaheadjsOptions, datasets];
+        }
+
+        $.fn.typeahead.apply(self.$input, typeaheadjsArgs).on('typeahead:selected', $.proxy(function (obj, datum, name) {
+          var index = 0;
+          datasets.some(function(dataset, _index) {
+            if (dataset.name === name) {
+              index = _index;
+              return true;
+            }
+            return false;
+          });
+
+          // @TODO Dep: https://github.com/corejavascript/typeahead.js/issues/89
+          if (datasets[index].valueKey) {
+            self.add(datum[datasets[index].valueKey]);
+          } else {
+            self.add(datum);
           }
-          var valueKey = typeaheadjs[1].valueKey; // We should test typeaheadjs.size >= 1
-          var f_datum = valueKey ? function (datum) { return datum[valueKey];  }
-                                 : function (datum) {  return datum;  }
-          $.fn.typeahead.apply(self.$input,typeaheadjs).on('typeahead:selected', $.proxy(function (obj, datum) {
-              self.add( f_datum(datum) );
-              self.$input.typeahead('val', '');
-            }, self));
 
+          self.$input.typeahead('val', '');
+        }, self));
       }
 
       self.$container.on('click', $.proxy(function(event) {
@@ -373,16 +390,16 @@
         self.$input.focus();
       }, self));
 
-        if (self.options.addOnBlur && self.options.freeInput) {
-          self.$input.on('focusout', $.proxy(function(event) {
-              // HACK: only process on focusout when no typeahead opened, to
-              //       avoid adding the typeahead text as tag
-              if ($('.typeahead, .twitter-typeahead', self.$container).length === 0) {
-                self.add(self.$input.val());
-                self.$input.val('');
-              }
-          }, self));
-        }
+      if (self.options.addOnBlur && self.options.freeInput) {
+        self.$input.on('focusout', $.proxy(function(event) {
+            // HACK: only process on focusout when no typeahead opened, to
+            //       avoid adding the typeahead text as tag
+            if ($('.typeahead, .twitter-typeahead', self.$container).length === 0) {
+              self.add(self.$input.val());
+              self.$input.val('');
+            }
+        }, self));
+      }
 
       // Toggle the 'focus' css class on the container when it has focus
       self.$container.on({
@@ -391,10 +408,12 @@
         },
         focusout: function() {
           self.$container.removeClass(self.options.focusClass);
+          var $inputWrapper = self.findInputWrapper();
+          $inputWrapper.siblings().last().after($inputWrapper);
         },
       });
 
-      self.$container.on('keydown', 'input', $.proxy(function(event) {
+      self.$container.on('keydown input', 'input', $.proxy(function(event) {
         var $input = $(event.target),
             $inputWrapper = self.findInputWrapper();
 
@@ -403,29 +422,33 @@
           return;
         }
 
-        switch (event.which) {
+        switch (event.key) {
           // BACKSPACE
-          case 8:
-            if (doGetCaretPosition($input[0]) === 0) {
-              var prev = $inputWrapper.prev();
-              if (prev.length) {
-                self.remove(prev.data('item'));
+          case 'Backspace':
+            if(self.options.deleteKeys && keyInList(event, self.options.deleteKeys) > -1){
+              if (doGetCaretPosition($input[0]) === 0) {
+                var prev = $inputWrapper.prev();
+                if (prev.length) {
+                  self.remove(prev.data('item'));
+                }
               }
             }
             break;
 
           // DELETE
-          case 46:
-            if (doGetCaretPosition($input[0]) === 0) {
-              var next = $inputWrapper.next();
-              if (next.length) {
-                self.remove(next.data('item'));
+          case 'Delete':
+            if(self.options.deleteKeys && keyInList(event, self.options.deleteKeys) > -1) {
+              if (doGetCaretPosition($input[0]) === 0) {
+                var next = $inputWrapper.next();
+                if (next.length) {
+                  self.remove(next.data('item'));
+                }
               }
             }
             break;
 
           // LEFT ARROW
-          case 37:
+          case 'ArrowLeft':
             // Try to move the input before the previous tag
             var $prevTag = $inputWrapper.prev();
             if ($input.val().length === 0 && $prevTag[0]) {
@@ -434,11 +457,27 @@
             }
             break;
           // RIGHT ARROW
-          case 39:
+          case 'ArrowRight':
             // Try to move the input after the next tag
             var $nextTag = $inputWrapper.next();
             if ($input.val().length === 0 && $nextTag[0]) {
               $nextTag.after($inputWrapper);
+              $input.focus();
+            }
+            break;
+          case 'Home':
+            // Try to move the input before the first tag
+            var $firstTag = $inputWrapper.siblings().first();
+            if ($input.val().length === 0 && $firstTag[0]) {
+              $firstTag.before($inputWrapper);
+              $input.focus();
+            }
+            break;
+          case 'End':
+            // Try to move the input after the last tag
+            var $lastTag = $inputWrapper.siblings().last();
+            if ($input.val().length === 0 && $lastTag[0]) {
+              $lastTag.after($inputWrapper);
               $input.focus();
             }
             break;
@@ -453,7 +492,7 @@
         $input.attr('size', Math.max(this.inputSize, $input.val().length));
       }, self));
 
-      self.$container.on('keypress', 'input', $.proxy(function(event) {
+      self.$container.on('keypress input', 'input', $.proxy(function(event) {
          var $input = $(event.target);
 
          if (self.$element.attr('disabled')) {
@@ -463,15 +502,16 @@
 
          var text = $input.val(),
          maxLengthReached = self.options.maxChars && text.length >= self.options.maxChars;
-         if (self.options.freeInput && (keyCombinationInList(event, self.options.confirmKeys) || maxLengthReached)) {
+         if (self.options.freeInput && (keyInList(event, self.options.confirmKeys) || (self.options.confirmOnPaste && event.originalEvent.type === 'input') || maxLengthReached)) {
             // Only attempt to add a tag if there is data in the field
             if (text.length !== 0) {
                self.add(maxLengthReached ? text.substr(0, self.options.maxChars) : text);
                $input.val('');
+               event.preventDefault();
             }
 
             // If the field is empty, let the event triggered fire as usual
-            if (self.options.cancelConfirmKeysOnEmpty === false) {
+            if (self.options.cancelConfirmKeysOnEmpty !== false) {
                 event.preventDefault();
             }
          }
@@ -620,6 +660,22 @@
       return '';
     }
   }
+  
+   var entityMap = {
+		"&": "&amp;",
+		"<": "&lt;",
+		">": "&gt;",
+		'"': '&quot;',
+		"'": '&#39;',
+		"/": '&#x2F;',
+		"\\": '&#x5C'
+	};
+	
+	function escapeString(str){
+		return String(str).replace(/[&<>"'\/\\]/g, function (s) {
+			return entityMap[s];
+		});
+	}
 
   /**
    * Returns the position of the caret in the given input field
@@ -639,32 +695,10 @@
   }
 
   /**
-    * Returns boolean indicates whether user has pressed an expected key combination.
-    * @param object keyPressEvent: JavaScript event object, refer
-    *     http://www.w3.org/TR/2003/WD-DOM-Level-3-Events-20030331/ecma-script-binding.html
-    * @param object lookupList: expected key combinations, as in:
-    *     [13, {which: 188, shiftKey: true}]
-    */
-  function keyCombinationInList(keyPressEvent, lookupList) {
-      var found = false;
-      $.each(lookupList, function (index, keyCombination) {
-          if (typeof (keyCombination) === 'number' && keyPressEvent.which === keyCombination) {
-              found = true;
-              return false;
-          }
-
-          if (keyPressEvent.which === keyCombination.which) {
-              var alt = !keyCombination.hasOwnProperty('altKey') || keyPressEvent.altKey === keyCombination.altKey,
-                  shift = !keyCombination.hasOwnProperty('shiftKey') || keyPressEvent.shiftKey === keyCombination.shiftKey,
-                  ctrl = !keyCombination.hasOwnProperty('ctrlKey') || keyPressEvent.ctrlKey === keyCombination.ctrlKey;
-              if (alt && shift && ctrl) {
-                  found = true;
-                  return false;
-              }
-          }
-      });
-
-      return found;
+   * Use event.key rather than event.which as which is deprecated.
+   */
+  function keyInList(keyPressEvent, lookupList) {
+    return $.inArray(keyPressEvent.key, lookupList) !== -1;
   }
 
   /**

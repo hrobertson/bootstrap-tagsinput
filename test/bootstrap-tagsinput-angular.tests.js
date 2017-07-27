@@ -70,7 +70,7 @@ describe('bootstrap-tagsinput', function() {
         });
 
         it('after last tag, should remove item from model', function() {
-          $('input', $element).trigger($.Event('keydown', { which: 8 }));
+          $('input', $element).trigger($.Event('keydown', { key: 'Backspace' }));
           $scope.$digest();
           expect($scope.tags.length).toBe(1);
         });

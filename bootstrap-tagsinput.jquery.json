@@ -1,6 +1,6 @@
 {
   "name": "bootstrap-tagsinput",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "title": "Bootstrap Tags Input",
   "author": {
     "name": "Tim Schlechter"
@@ -22,6 +22,6 @@
     "select",
     "form"
   ],
-  "download": "http://timschlechter.github.io/bootstrap-tagsinput/build/bootstrap-tagsinput.zip",
-  "homepage": "http://timschlechter.github.io/bootstrap-tagsinput/examples/"
+  "download": "http://hrobertson.github.io/bootstrap-tagsinput/dist/bootstrap-tagsinput.zip",
+  "homepage": "http://hrobertson.github.io/bootstrap-tagsinput/examples/"
 }
