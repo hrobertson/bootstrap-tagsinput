@@ -22,7 +22,7 @@
   ],
   "license": "MIT",
   "homepage": "http://hrobertson.github.io/bootstrap-tagsinput/examples/",
-  "download": "http://hrobertson.github.io/bootstrap-tagsinput/build/bootstrap-tagsinput.zip",
+  "download": "http://hrobertson.github.io/bootstrap-tagsinput/dist/bootstrap-tagsinput.zip",
   "keywords": [
     "tags",
     "bootstrap",
