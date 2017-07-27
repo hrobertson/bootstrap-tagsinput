@@ -1,10 +1,11 @@
-# Bootstrap Tags Input [![Build Status](https://travis-ci.org/bootstrap-tagsinput/bootstrap-tagsinput.svg?branch=master)](https://travis-ci.org/bootstrap-tagsinput/bootstrap-tagsinput)
 Bootstrap Tags Input is a jQuery plugin providing a Twitter Bootstrap user interface for managing tags.
 
-Current stable version: **v0.8.0**
+Current stable version: **v0.9.0**
+
+As the [original repo](https://github.com/bootstrap-tagsinput/bootstrap-tagsinput) is unmaintained, I have pulled in various bugfixes from other forks and made numerous fixes myself.
 
 ## Usage
-Examples can be found [here](http://bootstrap-tagsinput.github.io/bootstrap-tagsinput/examples/).
+Examples can be found [here](http://hrobertson.github.io/bootstrap-tagsinput/examples/).
 
 ## Features
 * Objects as tags
@@ -54,6 +55,21 @@ Current Library Versions:
 Libraries for testing go in the **/lib** directory.
 
 ## History
+- 0.9.0
+  - _From [iivmok](https://github.com/iivmok/bootstrap-tagsinput/commit/0c61cbc74bf56494e06a5b2da95ea7ce024a3c81)_ : Fix typeaheadjs examples
+  - _From [OlehBoiko](https://github.com/OlehBoiko/bootstrap-tagsinput/commit/30631b749e9abbdd9171060810d157739e2a4b4c)_ : Make case sensitivity optional
+  - _From [OlehBoiko](https://github.com/OlehBoiko/bootstrap-tagsinput/commit/e5045129b53fb41520ca9dc82b67e20d8331e4f6)_ : Allow specifying of delete keys like confirm keys
+  - _From [xhaggi](https://github.com/xhaggi/bootstrap-tagsinput/commit/b3597d11c98ac6650e926a16870e03bb627d14e8)_ : add support for latest version of bootstrap3-typeahead v4.0.2 and bloodhound v0.11.1
+  - _From [ObjectivityLtd](https://github.com/ObjectivityLtd/bootstrap-tagsinput/commit/cc842c4e4c83738a8b514109d77fe98a97a4edc4) (some hunks)_ : Handle special characters
+  - [Switch from using event.which to event.key as which is deprecated](https://github.com/hrobertson/bootstrap-tagsinput/commit/52506cb1c4739c87bbe83a56e71fdae93817e6ef)
+  - [Support pasting into the input](https://github.com/hrobertson/bootstrap-tagsinput/commit/f55c821ee1faa86307719bde0ba30a6003e21fe2)
+  - [Suppress default behaviour of confirm key](https://github.com/hrobertson/bootstrap-tagsinput/commit/4a9a523442d00957c6f1a4c7a78152099d080210)
+  - [Fix bug with `cancelConfirmKeysOnEmpty` behaviour being opposite to what it says](https://github.com/hrobertson/bootstrap-tagsinput/commit/3b13674047e0fa423bfbc079d8171462ceed5d91)
+  - [Use Home and End to navigate the tab list](https://github.com/hrobertson/bootstrap-tagsinput/commit/84ee5d31ba134473895eac36747120d6f5078a5c)
+  - [Fix bug passing typeaheadjs arguments](https://github.com/hrobertson/bootstrap-tagsinput/commit/0f18cbfaf872149ace0cc040c6f895b893059086)
+  - Angular Directive
+    - _From [xper](https://github.com/xper/bootstrap-tagsinput/commit/d77162bcc7d3ed9fb91e891c8b0dc96b17d7f079)_ : Expose maxTags, maxChars, trimValue, allowDuplicates
+    - [Directive no longer overrides tagsinputs default options](https://github.com/hrobertson/bootstrap-tagsinput/commit/d98310bef87fcba1504ee3be29f6fc9ba7967523)
 - 0.8.0
   - [Add possibility skip "change" event after "add", "remove", "removeAll"](https://github.com/bootstrap-tagsinput/bootstrap-tagsinput/pull/429)
   - [Please add version to header of non-minified version.](https://github.com/bootstrap-tagsinput/bootstrap-tagsinput/issues/438)

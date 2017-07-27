@@ -9,17 +9,20 @@
   "main": "dist/bootstrap-tagsinput.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/timschlechter/bootstrap-tagsinput.git"
+    "url": "git://github.com/hrobertson/bootstrap-tagsinput.git"
   },
   "author": "Tim Schlechter",
   "contributors": [
     {
       "name": "Luckner Jr Jean-Baptiste"
+    },
+    {
+      "name": "Hamish Robertson"
     }
   ],
   "license": "MIT",
-  "homepage": "http://timschlechter.github.io/bootstrap-tagsinput/examples/",
-  "download": "http://timschlechter.github.io/bootstrap-tagsinput/build/bootstrap-tagsinput.zip",
+  "homepage": "http://hrobertson.github.io/bootstrap-tagsinput/examples/",
+  "download": "http://hrobertson.github.io/bootstrap-tagsinput/build/bootstrap-tagsinput.zip",
   "keywords": [
     "tags",
     "bootstrap",
