@@ -1,5 +1,5 @@
 /*
- * bootstrap-tagsinput v0.9.0
+ * bootstrap-tagsinput v0.9.1
  * 
  */
 
