@@ -17,7 +17,8 @@
     return {
       restrict: 'EA',
       scope: {
-        model: '=ngModel'
+        model: '=ngModel',
+        options: '<?'
       },
       template: '<select multiple></select>',
       replace: false,
@@ -34,7 +35,7 @@
                   : scope.$parent[typeaheadSourceArray[0]])
               : null;
 
-          select.tagsinput(scope.$parent[attrs.options || ''] || {
+          select.tagsinput(scope.options || {
             typeahead : angular.isFunction(typeaheadSource) ? {
               source   : typeaheadSource
             } : void 0,
