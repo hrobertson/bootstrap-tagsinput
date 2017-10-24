@@ -4,6 +4,9 @@ Current stable version: **v0.9.0**
 
 As the [original repo](https://github.com/bootstrap-tagsinput/bootstrap-tagsinput) is unmaintained, I have pulled in various bugfixes from other forks and made numerous fixes myself.
 
+**I am not using this any more and will not be maintaining it**
+See [the original repo](https://github.com/bootstrap-tagsinput/bootstrap-tagsinput) or [other projects](https://github.com/Open-Xchange-Frontend/bootstrap-tokenfield)
+
 ## Usage
 Examples can be found [here](http://hrobertson.github.io/bootstrap-tagsinput/examples/).
 
